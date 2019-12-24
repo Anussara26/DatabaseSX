@@ -42,13 +42,13 @@ class CustomersController extends Controller
         $customers = new CustomersModel;
 
         $request->validate([
-          
+          'customerid' => 'required',
           'customerFirstName' => 'required',
           'customerLastName' => 'required',
           'customerphone'=>'required',
           'customeraddress' => 'required'
         ]);
-        
+        $customers->customerid = $request->customerFirstName;
         $customers->customerFirstName = $request->customerFirstName;
         $customers->customerLastName = $request->customerLastName;
         $customers->customerphone = $request->customerphone;
@@ -68,13 +68,7 @@ class CustomersController extends Controller
      */
     public function show($id)
     {
-        $customers = DB::table('Customers')
-        ->join('Pet','Customers.customerid','=','Pet.customerid' )
-        ->select('Customers.customerid','Customers.customerFirstName','Customers.customerLastName',
-        'Customers.customerphone','Customers.customeraddress',
-        'Pet.id','Pet.Pet_Name','Pet.Pet_sex')
-       ->where('Customers.customerid','=',$id) 
-       ->get();
+        $customers = CustomersModel::find($id);
         return view('customers.show',compact('customers'));
     }
 
@@ -86,8 +80,9 @@ class CustomersController extends Controller
      */
     public function edit($id)
     {
-        $customer = CustomersModel::find($id);
-        return view('customers.edit',compact('customers'));
+        $customers = CustomersModel::find($id);
+
+        return view("customers.edit",compact('customers'));
     }
 
     /**
@@ -99,7 +94,7 @@ class CustomersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $customer = CustomersModel::find($id);
+        $customers = CustomersModel::find($id);
 
         $request->validate([
             'customerid' =>'required',
@@ -108,12 +103,14 @@ class CustomersController extends Controller
             'customerphone'=>'required',
             'customeraddress' => 'required'
           ]);
+
+          
           $customers->customerid = $request->customerid;
           $customers->customerFirstName = $request->customerFirstName;
           $customers->customerLastName = $request->customerLastName;
           $customers->customerphone = $request->customerphone;
           $customers->customeraddress = $request->customeraddress;
-        $customer->update();
+        $customers->update();
 
         return redirect()->route('customers.index')
                         ->with('success','Customer update successfully.');
